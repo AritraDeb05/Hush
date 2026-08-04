@@ -338,26 +338,46 @@ export default function Home() {
 
   return (
     <main className="app-shell">
-      <section className="hero">
-        <div className="hero-copy-block">
-          <p className="eyebrow">Temporary group chat</p>
-          <h1>Hush</h1>
-          <p className="hero-copy">
-            A private room for friends that stays quiet, lightweight, and forgetful. New members only see messages from the moment they arrive.
-          </p>
-          <div className="hero-actions">
-            <span className="hero-pill">6-digit invite code</span>
-            <span className="hero-pill">Up to 8 people</span>
-            <span className="hero-pill">No previous history</span>
+      <header className="topbar">
+        <div className="brand-lockup">
+          <span className="brand-mark">H</span>
+          <div>
+            <p className="eyebrow">Temporary room chat</p>
+            <h1>Hush</h1>
           </div>
         </div>
-        <div className="hero-card">
-          <div className="hero-card-top">
-            <span className="hero-kicker">Live room</span>
-            <span className="hero-stat hero-count">{session ? `${memberCount}/${maxMembers}` : '0/8'}</span>
-            <span className="hero-subtext">{session ? 'People currently inside' : 'Create or join a lobby to begin'}</span>
+        <div className="topbar-badges">
+          <span className="hero-pill">Blue / ash theme</span>
+          <span className="hero-pill">No chat history</span>
+          <span className="hero-pill">8-person room cap</span>
+        </div>
+      </header>
+
+      <section className="hero hero-reworked">
+        <div className="hero-copy-block hero-copy-block-expanded">
+          <div className="hero-copy-head">
+            <p className="eyebrow">Private, temporary, clean</p>
+            <h2>Chat that fades with the room.</h2>
           </div>
-          <div className="hero-card-grid">
+          <p className="hero-copy hero-copy-strong">
+            Hush is built for small, temporary conversations. New members only see messages sent after they enter, and the room stays limited to 8 people.
+          </p>
+          <div className="hero-actions hero-actions-grid">
+            <span className="hero-pill">Start instantly</span>
+            <span className="hero-pill">Join with 6 digits</span>
+            <span className="hero-pill">No old messages</span>
+            <span className="hero-pill">Works on mobile</span>
+          </div>
+        </div>
+
+        <aside className="hero-card hero-card-expanded">
+          <div className="hero-card-top hero-card-top-strong">
+            <span className="hero-kicker">Live room pulse</span>
+            <span className="hero-stat hero-count">{session ? `${memberCount}/${maxMembers}` : '0/8'}</span>
+            <span className="hero-subtext">{session ? 'Members currently inside the room' : 'Create or join a lobby to begin'}</span>
+          </div>
+
+          <div className="hero-card-grid hero-card-grid-strong">
             <div>
               <span className="hero-label">Status</span>
               <span className="hero-value">{session ? 'Active' : 'Idle'}</span>
@@ -367,7 +387,7 @@ export default function Home() {
               <span className="hero-value">{session ? formatJoined(session.member.joinedAt) : '—'}</span>
             </div>
             <div>
-              <span className="hero-label">Code</span>
+              <span className="hero-label">Room code</span>
               <span className="hero-value hero-code">{session ? session.code : '------'}</span>
             </div>
             <div>
@@ -375,128 +395,130 @@ export default function Home() {
               <span className="hero-value">Join-time only</span>
             </div>
           </div>
-        </div>
+        </aside>
       </section>
 
-      <section className="control-grid">
-        <form className="panel" onSubmit={createLobby}>
-          <div className="panel-head">
-            <p className="panel-kicker">Create lobby</p>
-            <h2>Start a new room</h2>
-          </div>
-          <label className="field">
-            <span>Name</span>
-            <input
-              className="input"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your name"
-              autoComplete="nickname"
-            />
-          </label>
-          <button className="button primary" type="submit" disabled={loading}>
-            Create lobby
-          </button>
-        </form>
-
-        <form className="panel" onSubmit={joinExistingLobby}>
-          <div className="panel-head">
-            <p className="panel-kicker">Join lobby</p>
-            <h2>Enter the 6-digit code</h2>
-          </div>
-          <label className="field">
-            <span>Code</span>
-            <input
-              className="input code-input"
-              value={joinCode}
-              onChange={(event) => setJoinCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
-              placeholder="123456"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-            />
-          </label>
-          <label className="field">
-            <span>Name</span>
-            <input
-              className="input"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              placeholder="Your name"
-              autoComplete="nickname"
-            />
-          </label>
-          <button className="button secondary" type="submit" disabled={loading}>
-            Join lobby
-          </button>
-        </form>
-      </section>
-
-      <section className="panel chat-panel">
-        <div className="chat-topbar">
-          <div>
-            <p className="panel-kicker">Active room</p>
-            <h2>{session ? `Lobby ${session.code}` : 'No lobby joined yet'}</h2>
-            <p className="muted">{notice}</p>
-          </div>
-          {session ? (
-            <div className="room-actions">
-              <button className="button ghost small" type="button" onClick={copyCode}>
-                {copied ? 'Copied' : 'Copy code'}
-              </button>
-              <button className="button ghost small" type="button" onClick={leaveLobby}>
-                Leave
-              </button>
+      <section className="dashboard-grid">
+        <div className="controls-stack">
+          <form className="panel panel-accent" onSubmit={createLobby}>
+            <div className="panel-head">
+              <p className="panel-kicker">Create lobby</p>
+              <h2>Start a new room</h2>
             </div>
-          ) : null}
+            <label className="field">
+              <span>Name</span>
+              <input
+                className="input"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Your name"
+                autoComplete="nickname"
+              />
+            </label>
+            <button className="button primary" type="submit" disabled={loading}>
+              Create lobby
+            </button>
+          </form>
+
+          <form className="panel panel-muted" onSubmit={joinExistingLobby}>
+            <div className="panel-head">
+              <p className="panel-kicker">Join lobby</p>
+              <h2>Enter the 6-digit code</h2>
+            </div>
+            <label className="field">
+              <span>Code</span>
+              <input
+                className="input code-input"
+                value={joinCode}
+                onChange={(event) => setJoinCode(event.target.value.replace(/\D/g, '').slice(0, 6))}
+                placeholder="123456"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+              />
+            </label>
+            <label className="field">
+              <span>Name</span>
+              <input
+                className="input"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                placeholder="Your name"
+                autoComplete="nickname"
+              />
+            </label>
+            <button className="button secondary" type="submit" disabled={loading}>
+              Join lobby
+            </button>
+          </form>
         </div>
 
-        <div className="message-list">
-          {!session ? (
-            <div className="empty-state">
-              <h3>Join or create a room to start chatting.</h3>
-              <p>Every member only sees messages created after their join time.</p>
+        <section className="panel chat-panel chat-panel-shell">
+          <div className="chat-topbar chat-topbar-shell">
+            <div>
+              <p className="panel-kicker">Active room</p>
+              <h2>{session ? `Lobby ${session.code}` : 'No lobby joined yet'}</h2>
+              <p className="muted">{notice}</p>
             </div>
-          ) : messages.length === 0 ? (
-            <div className="empty-state">
-              <h3>No messages yet.</h3>
-              <p>Send the first one. Older history stays hidden from new members.</p>
-            </div>
-          ) : (
-            messages.map((message) => {
-              const mine = message.memberId === session.member.id;
+            {session ? (
+              <div className="room-actions">
+                <button className="button ghost small" type="button" onClick={copyCode}>
+                  {copied ? 'Copied' : 'Copy code'}
+                </button>
+                <button className="button ghost small" type="button" onClick={leaveLobby}>
+                  Leave
+                </button>
+              </div>
+            ) : null}
+          </div>
 
-              return (
-                <article key={message.id} className={`message ${mine ? 'mine' : ''}`}>
-                  <div className="avatar">{initials(message.memberName)}</div>
-                  <div className="message-body">
-                    <div className="message-meta">
-                      <strong>{mine ? 'You' : message.memberName}</strong>
-                      <span>{formatTime(message.createdAt)}</span>
+          <div className="message-list message-list-shell">
+            {!session ? (
+              <div className="empty-state">
+                <h3>Join or create a room to start chatting.</h3>
+                <p>Every member only sees messages created after their join time.</p>
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="empty-state">
+                <h3>No messages yet.</h3>
+                <p>Send the first one. Older history stays hidden from new members.</p>
+              </div>
+            ) : (
+              messages.map((message) => {
+                const mine = message.memberId === session.member.id;
+
+                return (
+                  <article key={message.id} className={`message ${mine ? 'mine' : ''}`}>
+                    <div className="avatar">{initials(message.memberName)}</div>
+                    <div className="message-body">
+                      <div className="message-meta">
+                        <strong>{mine ? 'You' : message.memberName}</strong>
+                        <span>{formatTime(message.createdAt)}</span>
+                      </div>
+                      <p className="bubble">{message.text}</p>
                     </div>
-                    <p className="bubble">{message.text}</p>
-                  </div>
-                </article>
-              );
-            })
-          )}
-          <div ref={bottomRef} />
-        </div>
+                  </article>
+                );
+              })
+            )}
+            <div ref={bottomRef} />
+          </div>
 
-        <form className="composer" onSubmit={sendMessage}>
-          <input
-            className="input composer-input"
-            value={messageText}
-            onChange={(event) => setMessageText(event.target.value)}
-            placeholder={session ? 'Write a message...' : 'Join a lobby first'}
-            disabled={!session}
-          />
-          <button className="button primary" type="submit" disabled={!session || loading}>
-            Send
-          </button>
-        </form>
+          <form className="composer composer-shell" onSubmit={sendMessage}>
+            <input
+              className="input composer-input"
+              value={messageText}
+              onChange={(event) => setMessageText(event.target.value)}
+              placeholder={session ? 'Write a message...' : 'Join a lobby first'}
+              disabled={!session}
+            />
+            <button className="button primary" type="submit" disabled={!session || loading}>
+              Send
+            </button>
+          </form>
+        </section>
       </section>
 
-      <p className={`status ${error ? 'error' : ''}`} aria-live="polite">
+      <p className={`status status-bar ${error ? 'error' : ''}`} aria-live="polite">
         {error || `Up to ${maxMembers} people per room. Messages stay hidden until a member joins.`}
       </p>
     </main>
