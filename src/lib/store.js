@@ -198,6 +198,31 @@ export async function addMessage(code, message) {
   return lobby;
 }
 
+export async function removeMember(code, memberId) {
+  const lobby = await readLobby(code);
+
+  if (!lobby) {
+    return null;
+  }
+
+  const nextMembers = lobby.members.filter((member) => member.id !== memberId);
+
+  if (nextMembers.length === lobby.members.length) {
+    return lobby;
+  }
+
+  if (nextMembers.length === 0) {
+    await removeLobby(code);
+    return null;
+  }
+
+  lobby.members = nextMembers;
+  lobby.updatedAt = Date.now();
+  await writeLobby(code, lobby);
+
+  return lobby;
+}
+
 export async function getMessages(code, since = 0) {
   const lobby = await readLobby(code);
 
