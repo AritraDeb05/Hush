@@ -301,13 +301,36 @@ export default function Home() {
     navigator.clipboard.writeText(session.code).then(() => setCopied(true));
   }
 
-  function leaveLobby() {
+  async function leaveLobby() {
+    const currentSession = sessionRef.current;
+
+    if (currentSession) {
+      try {
+        const response = await fetch('/api/leave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            code: currentSession.code,
+            memberId: currentSession.member.id,
+          }),
+        });
+
+        const payload = await response.json();
+
+        if (response.ok && payload.lobby) {
+          setLobby(payload.lobby);
+        }
+      } catch {
+        setError('Could not leave the lobby cleanly. Your local session was still cleared.');
+      }
+    }
+
     window.localStorage.removeItem(STORAGE_KEY);
     setSession(null);
     setMessages([]);
     setLobby(null);
     setMessageText('');
-    setNotice('Lobby closed on this device. Rejoin with the same code if it is still active.');
+    setNotice('You left this lobby on this device. Rejoin with the same 6-digit code if it is still active.');
   }
 
   const memberCount = lobby?.memberCount ?? (session ? 1 : 0);
@@ -316,17 +339,42 @@ export default function Home() {
   return (
     <main className="app-shell">
       <section className="hero">
-        <div>
+        <div className="hero-copy-block">
           <p className="eyebrow">Temporary group chat</p>
           <h1>Hush</h1>
           <p className="hero-copy">
-            A private lobby for friends. Messages only appear from the moment you join, and each room stops at 8 people.
+            A private room for friends that stays quiet, lightweight, and forgetful. New members only see messages from the moment they arrive.
           </p>
+          <div className="hero-actions">
+            <span className="hero-pill">6-digit invite code</span>
+            <span className="hero-pill">Up to 8 people</span>
+            <span className="hero-pill">No previous history</span>
+          </div>
         </div>
         <div className="hero-card">
-          <span className="hero-stat">{session ? `${memberCount}/${maxMembers} in room` : 'Fresh room'}</span>
-          <span className="hero-stat subtle">{session ? `Joined ${formatJoined(session.member.joinedAt)}` : 'No history for new members'}</span>
-          <span className="hero-stat subtle">{session ? `Code ${session.code}` : 'Create a 6-digit invite code'}</span>
+          <div className="hero-card-top">
+            <span className="hero-kicker">Live room</span>
+            <span className="hero-stat hero-count">{session ? `${memberCount}/${maxMembers}` : '0/8'}</span>
+            <span className="hero-subtext">{session ? 'People currently inside' : 'Create or join a lobby to begin'}</span>
+          </div>
+          <div className="hero-card-grid">
+            <div>
+              <span className="hero-label">Status</span>
+              <span className="hero-value">{session ? 'Active' : 'Idle'}</span>
+            </div>
+            <div>
+              <span className="hero-label">Joined</span>
+              <span className="hero-value">{session ? formatJoined(session.member.joinedAt) : '—'}</span>
+            </div>
+            <div>
+              <span className="hero-label">Code</span>
+              <span className="hero-value hero-code">{session ? session.code : '------'}</span>
+            </div>
+            <div>
+              <span className="hero-label">Visibility</span>
+              <span className="hero-value">Join-time only</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -448,7 +496,9 @@ export default function Home() {
         </form>
       </section>
 
-      <p className={`status ${error ? 'error' : ''}`}>{error || `Up to ${maxMembers} people per room. Messages stay hidden until a member joins.`}</p>
+      <p className={`status ${error ? 'error' : ''}`} aria-live="polite">
+        {error || `Up to ${maxMembers} people per room. Messages stay hidden until a member joins.`}
+      </p>
     </main>
   );
 }
